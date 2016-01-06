@@ -21,11 +21,22 @@
 #include <stdlib.h>
 using namespace::std;
 
-int main()
+int main(int argc, char *argv[])
 {
 	int N =50;
-	int dt = 1000000;
 
+	int dt = 1000;
+	if(argc == 2) {
+		try {
+			dt = stoi(argv[1]);
+		}
+		catch(exception& e) {
+			cerr << "Unable to cast " << argv[1] << " to int" << endl;
+			cerr << "ERROR: " << e.what() << endl;
+			return 1;
+		}
+	}
+		
 	double ti = 10000;
 	double tf = ti+dt;
 
@@ -38,7 +49,7 @@ int main()
 	Output out_0_ti;	
 	Output out(dt);
 
-	double atol = 1.e-9;
+	double atol = 1.e-5;
 	double rtol = atol;
 	double h1 = 0.01;
 	double hmin = 0.0;
@@ -62,7 +73,7 @@ int main()
 		}
 	}
 
-	double th = 0.5;
+	double th = 0.4;
 	if(xmax > abs(xmin)) {
 		th *= xmax;
 	} else {
@@ -72,7 +83,7 @@ int main()
 	vector<int> sau(dt,0);
 	for(int t=0;t<dt;++t){
 		for(int i=0;i<N;++i) {
-			if(out.ysave[i][t] > th)
+			if( abs(out.ysave[i][t]) > th)
 				++sau[t];
 		}
 	}
