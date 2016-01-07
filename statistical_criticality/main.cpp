@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 	double ti = 10000;
 	double tf = ti+dt;
 
+	double th = 2.5;
+
 	VecDoub xw(N+N*N);
 	Ran r(12345677);
 	for(int i=0;i<(N+N*N);++i)  xw[i] = r.doub();
@@ -62,34 +64,17 @@ int main(int argc, char *argv[])
 	Odeint<StepperDopr5<NW> > ode(xw,ti,tf,atol,rtol,h1,hmin,out,nw);
 	ode.integrate();
 
-	double xmax=0;
-	double xmin=0;
-	for(int t=0;t<dt;++t){
-		for(int i=0;i<N;++i) {
-			if(out.ysave[i][t] > xmax)
-				xmax = out.ysave[i][t];
-			if(out.ysave[i][t] < xmin)
-				xmin = out.ysave[i][t];
-		}
-	}
-
-	double th = 0.4;
-	if(xmax > abs(xmin)) {
-		th *= xmax;
-	} else {
-		th *= -1*xmin;
-	}
-
 	vector<int> sau(dt,0);
 	for(int t=0;t<dt;++t){
 		for(int i=0;i<N;++i) {
-			if( abs(out.ysave[i][t]) > th)
+			if( abs(out.ysave[i][t]) > th){
 				++sau[t];
+			}
 		}
 	}
 
 	write_matrix(sau,dt,"sau.csv");
-	write_matrix(out.xsave,dt,"t_stat.csv");
-	write_matrix(out.ysave,N+N*N,dt,"xw_stat.csv");
+//	write_matrix(out.xsave,dt,"t.csv");
+	write_matrix(out.ysave,N+N*N,dt,"xw.csv");
 	return 0;
 }

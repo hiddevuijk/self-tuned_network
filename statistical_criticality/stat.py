@@ -2,6 +2,14 @@ import numpy as np
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
+import sys
+
+save = False
+name = ''
+if len(sys.argv) == 2:
+	save=True
+	name = sys.argv[1]
+
 
 t = np.genfromtxt("t_stat.csv",delimiter=';')
 ysave = np.genfromtxt("xw_stat.csv",delimiter=';')
@@ -54,6 +62,10 @@ print len(s), ' sau.csv'
 print len(sau), ' sau'
 print sum(s-sau)
 plt.hist(sau,log=True,normed=True)
-plt.show()
+
+if not save:
+	plt.show()
+else:
+	plt.savefig(name+'.pdf')
 
 
