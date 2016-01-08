@@ -10,7 +10,15 @@ if len(sys.argv) == 2:
 
 
 sau = np.genfromtxt("sau.csv",delimiter=';')
-plt.hist(sau,log=True,normed=True,bins = np.arange(min(sau),max(sau)+1,1))
+N = int(max(sau))
+Psau = [0]*(N+1)
+for i in range(len(sau)):
+	n = int(sau[i])
+	Psau[n] = Psau[n] + 1./len(sau)
+
+
+plt.plot(Psau)
+plt.yscale('log')
 plt.title("distribution of simultaniously active units")
 if not save:
 	plt.show()
