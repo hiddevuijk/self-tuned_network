@@ -65,16 +65,25 @@ int main(int argc, char *argv[])
 	ode.integrate();
 
 	vector<int> sau(dt,0);
+	vector<int> avs(dt,0);
+	int j=0;
 	for(int t=0;t<dt;++t){
 		for(int i=0;i<N;++i) {
 			if( abs(out.ysave[i][t]) > th){
 				++sau[t];
 			}
 		}
+		if(sau[t] != 0){
+			avs[j] += sau[t];
+		} else if ( avs[j] != 0) {
+			++j;
+		}
 	}
 
 	write_matrix(sau,dt,"sau.csv");
+	write_matrix(avs,j,"avs.csv");
 //	write_matrix(out.xsave,dt,"t.csv");
 	write_matrix(out.ysave,N+N*N,dt,"xw.csv");
+
 	return 0;
 }
