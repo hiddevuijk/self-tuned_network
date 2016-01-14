@@ -15,6 +15,7 @@ nmax = 30
 acorr = np.genfromtxt("acorr.csv",delimiter=';')
 acorr_abs = np.genfromtxt("acorr_abs.csv",delimiter=';')
 
+
 def expf(x,c):
 	return np.exp(-x*c)
 
@@ -24,19 +25,39 @@ X = np.linspace(0.,nmax,nmax)
 
 plt.ylim([-.2,1])
 
-plt.subplot(2,1,1)
+plt.subplot(2,2,1)
 plt.plot(acorr[:nmax],color='black')
 plt.plot(x0,color='black')
 popt, pcov = curve_fit(expf,X,acorr[:nmax])
 plt.plot(X,expf(X,*popt),color='blue')
 plt.title("acorr")
 
-plt.subplot(2,1,2)
+plt.subplot(2,2,3)
+xF = np.fft.fft(acorr)
+N = len(xF)
+xF = xF[:N/2]
+fr = np.linspace(0,0.5,N/2)
+plt.plot(fr,abs(xF)**2)
+plt.yscale('log')
+plt.xscale('log')
+
+
+plt.subplot(2,2,2)
 plt.plot(acorr_abs[:nmax],color='black')
 plt.plot(x0,color='black')
 popt, pcov = curve_fit(expf,X,acorr_abs[:nmax])
 plt.plot(X,expf(X,*popt),color='blue')
 plt.title("acorr_abs")
+
+plt.subplot(2,2,4)
+xF = np.fft.fft(acorr_abs)
+N = len(xF)
+xF = xF[:N/2]
+fr = np.linspace(0,0.5,N/2)
+plt.plot(fr,abs(xF)**2)
+plt.yscale('log')
+plt.xscale('log')
+
 
 plt.tight_layout()
 

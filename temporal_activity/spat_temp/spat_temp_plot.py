@@ -28,21 +28,26 @@ if (N1<0 and N2<0) or (N1>0 and N2>0):
 	print "-----------------"
 N = int(N)
 x= np.asarray([[0.]*tmax]*N)
+abs_act = np.asarray([0.]*tmax)
 for ti in range(tmax):
 	for i in range(N):
 		x[i][ti] = ysave[i][ti]
+		abs_act[ti] = abs_act[ti] + abs(ysave[i][ti])/N
 
 my_cmap = cm.get_cmap('hot')
-plt.subplot(3,1,1)
+plt.subplot(4,1,1)
 plt.imshow(x,aspect='auto',cmap=my_cmap,interpolation='nearest')
 plt.colorbar()
 plt.title("Evolution of X")
-plt.subplot(3,1,2)
+plt.subplot(4,1,2)
 plt.plot(x[1])
 plt.title("node 1")
-plt.subplot(3,1,3)
+plt.subplot(4,1,3)
 plt.plot(activity)
 plt.title("evolution of sum of X")
+plt.subplot(4,1,4)
+plt.plot(abs_act)
+plt.title('sum of abs x')
 
 plt.tight_layout()
 

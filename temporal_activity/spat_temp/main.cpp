@@ -65,10 +65,9 @@ int main(int argc, char *argv[])
 	ode.integrate();
 
 	int tacorr2 = pow2(2*tacorr);
-
-	VecDoub acorr(tacorr,0.0); 			// avg(correl(xi))
-	VecDoub acorr_temp(tacorr2,0.0);	// input to correl(xi)
-	VecDoub acorr_ans(tacorr2,0.0);		// ans correl(xi)
+	VecDoub acorr(tacorr,0.0);
+	VecDoub acorr_temp(tacorr2,0.0);
+	VecDoub acorr_ans(tacorr2,0.0);
 	VecDoub acorr_temp_avg(tacorr2,0.0);
 	VecDoub acorr_ans_avg(tacorr2,0.0);
 
@@ -86,9 +85,9 @@ int main(int argc, char *argv[])
 	}
 
 
-	write_matrix(acorr_temp_avg,tacorr,"activity.csv");
-	for(int t=0;t<tacorr;++t) acorr_temp_avg[t] /= (double)N;
+//	for(int t=0;t<tacorr;++t) acorr_temp_avg[t] /= (double)N;
 
+	write_matrix(acorr_temp_avg,tacorr,"activity.csv");
 
 	double m = mean(acorr_temp_avg,tacorr);
 	for(int t=0;t<tacorr;++t) acorr_temp_avg[t] -= m;
@@ -122,7 +121,7 @@ int main(int argc, char *argv[])
 
 
 	
-	write_matrix(acorr_ans_avg,tacorr,"acorr_avg.csv");
+	write_matrix(acorr_ans_avg,tacorr,"acorr_avg_abs.csv");
 	write_matrix(acorr_abs,tacorr,"acorr_abs.csv");
 	write_matrix(acorr_ans_avg_abs,tacorr,"acorr_avg_abs.csv");
 	write_matrix(out.ysave,N+N*N,dt,"xw.csv");
