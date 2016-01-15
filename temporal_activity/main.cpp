@@ -66,66 +66,65 @@ int main(int argc, char *argv[])
 
 	int tacorr2 = pow2(2*tacorr);
 
-	VecDoub acorr(tacorr,0.0); 			// avg(correl(xi))
-	VecDoub acorr_temp(tacorr2,0.0);	// input to correl(xi)
-	VecDoub acorr_ans(tacorr2,0.0);		// ans correl(xi)
-	VecDoub acorr_temp_avg(tacorr2,0.0);
-	VecDoub acorr_ans_avg(tacorr2,0.0);
+	VecDoub acorr(tacorr,0.0); 		// avg(correl(temp))
+	VecDoub temp(tacorr2,0.0);		// xi
+	VecDoub acorr_ans(tacorr2,0.0);	// correl(xi)
+
+	VecDoub acorr_abs(tacorr,0.0);	// avg(correl(temp_abs))
+	VecDoub temp_abs(tacorr2,0.0);	// abs(xi)
+	VecDoub acorr_abs_ans(tacorr2,0.0); // correl(abs(xi))
+
+	VecDoub activity(tacorr2,0.0);		// sum(xi)
+	VecDoub activity_abs(tacorr2,0.0);	// sum(abs(xi))
+
+	VecDoub acorr_avg(tacorr2,0.0);		// avg(abs(xi))
+	VecDoub acorr_abs_avg(tacorr2,0.0);	// correl(avg(abs(xi)))
 
 	for(int i=0;i<N;++i) {
 		for(int t=0;t<tacorr;++t) {
-			acorr_temp[t] = out.ysave[i][t];
-			acorr_temp_avg[t] += out.ysave[i][t];
+			temp[t] = out.ysave[i][t];
+			temp_abs[t] = abs(out.ysave[i][t]);
+			activity[t] += out.ysave[i][t];
+			activity_abs[t] += abs(out.ysave[i][t]);
 		}
-		double m = mean(acorr_temp,tacorr);
-		add_to_vec(acorr_temp,tacorr,-1.*m);
-		correl(acorr_temp,acorr_temp,acorr_ans);
+
+		double m = mean(temp,tacorr);
+		add_to_vec(temp,tacorr,-1.*m);
+		correl(temp,temp,acorr_ans);
+
+		m = mean(temp_abs,tacorr);
+		add_to_vec(temp_abs,tacorr,-1.*m);
+		correl(temp_abs,temp_abs,acorr_abs_ans);
+
 		for(int t=0;t<tacorr;++t) {
 			acorr[t] += acorr_ans[t]/(acorr_ans[0]*N);
+			acorr_abs[t] += acorr_abs_ans[t]/(acorr_abs_ans[0]*N);
 		}
 	}
 
+	write_matrix(activity,tacorr,"activity.csv");
+	write_matrix(activity_abs,tacorr,"activity_abs.csv");
 
-	write_matrix(acorr_temp_avg,tacorr,"activity.csv");
-	for(int t=0;t<tacorr;++t) acorr_temp_avg[t] /= (double)N;
+	double m = mean(activity,tacorr);
+	add_to_vec(activity,tacorr,-1.*m);
+	correl(activity,activity,acorr_avg);
 
+	m = mean(activity_abs,tacorr);
+	add_to_vec(activity_abs,tacorr,-1.*m);
+	correl(activity_abs,activity_abs,acorr_abs_avg);
 
-	double m = mean(acorr_temp_avg,tacorr);
-	for(int t=0;t<tacorr;++t) acorr_temp_avg[t] -= m;
-	correl(acorr_temp_avg,acorr_temp_avg,acorr_ans_avg);
-	double acorr_ans_avg0 = acorr_ans_avg[0];
-	for(int t=0;t<tacorr;++t) acorr_ans_avg[t] /= acorr_ans_avg0;
+	double acorr_avg0 = acorr_avg[0];
+	double acorr_abs_avg0 = acorr_abs_avg[0];
 
-	VecDoub acorr_abs(tacorr,0.0);
-	VecDoub acorr_temp_abs(tacorr2,0.0);
-	VecDoub acorr_ans_abs(tacorr2,0.0);
-	VecDoub acorr_temp_avg_abs(tacorr2,0.0);
-	VecDoub acorr_ans_avg_abs(tacorr2,0.0);
-	for(int i=0;i<N;++i) {
-		for(int t=0;t<tacorr;++t) {
-			acorr_temp_abs[t] = abs(out.ysave[i][t]);
-			acorr_temp_avg_abs[t] += abs(out.ysave[i][t]);
-		}
-		double m = mean(acorr_temp_abs,tacorr);
-		add_to_vec(acorr_temp_abs,tacorr,-1.*m);
-		correl(acorr_temp_abs,acorr_temp_abs,acorr_ans_abs);
-		for(int t=0;t<tacorr;++t) {
-			acorr_abs[t] += acorr_ans_abs[t]/(acorr_ans_abs[0]*N);
-		}
+	for(int t = 0;t<tacorr;++t) {
+		acorr_avg[t] /= acorr_avg0;
+		acorr_abs_avg[t] /= acorr_abs_avg0;
 	}
-	for(int t=0;t<tacorr;++t) acorr_temp_avg_abs[t] /= (double)N;
-	 m = mean(acorr_temp_avg_abs,tacorr);
-	for(int t=0;t<tacorr;++t) acorr_temp_avg_abs[t] -= m;
-	correl(acorr_temp_avg_abs,acorr_temp_avg_abs,acorr_ans_avg_abs);
-	double acorr_ans_avg_abs0 = acorr_ans_avg_abs[0];
-	for(int t=0;t<tacorr;++t) acorr_ans_avg_abs[t] /= acorr_ans_avg_abs0;
-
-
 	
-	write_matrix(acorr_ans_avg,tacorr,"acorr_avg.csv");
+	write_matrix(acorr_avg,tacorr,"acorr_avg.csv");
+	write_matrix(acorr_abs_avg,tacorr,"acorr_abs_avg.csv");
+	write_matrix(acorr,tacorr,"acorr.csv");
 	write_matrix(acorr_abs,tacorr,"acorr_abs.csv");
-	write_matrix(acorr_ans_avg_abs,tacorr,"acorr_avg_abs.csv");
-	write_matrix(out.ysave,N+N*N,dt,"xw.csv");
 
 	return 0;
 }
