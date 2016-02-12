@@ -10,10 +10,13 @@ if len(sys.argv) == 2:
 	save = True
 
 cc = np.genfromtxt("cc.csv",delimiter=';')
+t = np.genfromtxt("lag.csv",delimiter=';')
 
-print np.std(cc)
-exit(0)
+plt.subplot(1,2,1)
 plt.hist(cc,50)
+plt.subplot(1,2,2)
+plt.hist(t)
+
 if(not save):
 	plt.show()
 else:

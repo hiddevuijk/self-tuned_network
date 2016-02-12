@@ -14,6 +14,8 @@
 #include "headers/derivatives.h"
 #include "headers/write_matrix.h"
 #include "headers/other.h"
+#include "headers/box_muller.h"
+#include "headers/find_max.h"
 
 // std headers
 #include <iostream>
@@ -37,14 +39,16 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 	}
-	int tacorr = dt;
-		
+			
 	double ti = 10000;
 	double tf = ti+dt;
 
+	dt*=100;
+	int tacorr = dt;
+
 	VecDoub xw(N+N*N);
 	Ran r(12345677);
-	for(int i=0;i<(N+N*N);++i)  xw[i] = r.doub();
+	for(int i=0;i<(N+N*N);++i)  xw[i] = bm_transform(r);
 	double alpha = 1e-3;	
 	NW nw(alpha,N);
 
@@ -69,9 +73,9 @@ int main(int argc, char *argv[])
 	VecDoub a(tcorr2,0.0);
 	VecDoub b(tcorr2,0.0);
 	VecDoub corr(tcorr2,0.0);
-	VecDoub corr_avg(tcorr2,0.0);
+//	VecDoub corr_avg(tcorr2,0.0);
 	vector<double> corr_coef;
-
+	vector<double> corr_lag;
 	int i1 = r.int64() % (N-1);
 	int i2 = r.int64() % (N-1);
 	int j1 = r.int64() % (N-1);
@@ -93,6 +97,10 @@ int main(int argc, char *argv[])
 			normal_form(b,dt);	
 			correl(a,b,corr);
 			multiply_vec(corr,tcorr2,1/(double)dt);
+			double maxt, maxc;
+			find_max_in_range(corr,tcorr2,0.05*dt,maxt,maxc);
+			corr_coef.push_back(maxc);
+			corr_lag.push_back(maxt);
 			if(i==i1 and j==j1)
 				write_matrix(corr,tcorr2,"corr_1.csv");
 			if(i==i2 and j==j2)
@@ -100,18 +108,19 @@ int main(int argc, char *argv[])
 			if(i==i3 and j==j3)
 				write_matrix(corr,tcorr2,"corr_3.csv");
 
-			for(int k=0;k<tcorr2;++k)
-				corr_avg[k] = corr[k]/((double)N*(N-1));
-			if(i<j){
-				corr_coef.push_back(corr[0]);
-			}
+//			for(int k=0;k<tcorr2;++k)
+//				corr_avg[k] = corr[k]/((double)N*(N-1));
+//			if(i<j){
+//				corr_coef.push_back(corr[0]);
+//			}
 		}
 	}
 	
 
 
 	write_matrix(corr_coef,corr_coef.size(),"cc.csv");
-	write_matrix(corr_avg,tcorr2,"corr.csv");
+	write_matrix(corr_lag,corr_lag.size(),"lag.csv");
+//	write_matrix(corr_avg,tcorr2,"corr.csv");
 
 	
 	return 0;

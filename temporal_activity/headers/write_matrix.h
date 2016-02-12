@@ -23,7 +23,7 @@ void write_matrix(const Mat &m, const int cols, const int rows, std::string name
 	for(int r=0;r<cols;r++){
 		for(int c=0;c<rows;c++) {
 			outstream << m[r][c];
-			if( c<(cols-1) ) outstream << delimiter1;
+			if( c<(rows-1) ) outstream << delimiter1;
 		}
 		outstream << delimiter2;
 	}
